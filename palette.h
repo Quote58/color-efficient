@@ -60,7 +60,7 @@ enum RelationshipSat {
  */
 struct Component {
 	wxString _name = "";
-	wxColour _clr = wxColour(0,0,0,0);
+	wxColour _clr = wxNullColour;
 	int _group = -1;
 	bool _setByUser = false;
 
@@ -77,8 +77,17 @@ struct Component {
 
 	Background _background = kBackNone;
 
+	wxColour _staticColour = wxNullColour;
+
 	Component(wxString name) {
 		_name = name;
+	}
+
+	Component(wxString name, int group, Background background, wxColour staticColour) {
+		_name = name;
+		_group = group;
+		_background = background;
+		_staticColour = staticColour;
 	}
 
 	Component(wxString name, int group, Background background) {

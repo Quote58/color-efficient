@@ -216,7 +216,12 @@ void PaletteTable::generatePalette() {
 				clr = wxColour(r, g, b);
 			}
 
-			_template->_components[i]._clr = clr;
+			if (_template->_components[i]._staticColour != wxNullColour) {
+				_template->_components[i]._clr = _template->_components[i]._staticColour;
+
+			} else if (_template->_components[i]._setByUser != true) {
+				_template->_components[i]._clr = clr;
+			}
 		}
 	}
 
@@ -247,7 +252,11 @@ void PaletteTable::resolvePalette(std::vector<std::vector<Component *>> palette)
 		b = rgb.b;
 		dominantClr = wxColour(r, g, b);
 
-		palette[p][0]->_clr = dominantClr;
+		if (palette[p][0]->_staticColour != wxNullColour) {
+			palette[p][0]->_clr = palette[p][0]->_staticColour;
+		} else if (palette[p][0]->_setByUser != true) {
+			palette[p][0]->_clr = dominantClr;
+		}
 	}
 
 	for (int p = 0; p < palette.size(); p++) {
@@ -266,7 +275,12 @@ void PaletteTable::resolvePalette(std::vector<std::vector<Component *>> palette)
 				g = rgb.g;
 				b = rgb.b;
 
-				palette[p][1]->_clr = wxColour(r, g, b);
+				if (palette[p][1]->_staticColour != wxNullColour) {
+					palette[p][1]->_clr = palette[p][1]->_staticColour;
+
+				} else if (palette[p][1]->_setByUser != true) {
+					palette[p][1]->_clr = wxColour(r, g, b);
+				}
 				break;
 			// 3 colours = triadic
 			case 3:
@@ -278,7 +292,12 @@ void PaletteTable::resolvePalette(std::vector<std::vector<Component *>> palette)
 					g = rgb.g;
 					b = rgb.b;
 
-					palette[p][i]->_clr = wxColour(r, g, b);
+					if (palette[p][i]->_staticColour != wxNullColour) {
+						palette[p][i]->_clr = palette[p][i]->_staticColour;
+
+					} else if (palette[p][i]->_setByUser != true) {
+						palette[p][i]->_clr = wxColour(r, g, b);
+					}
 				}
 				break;
 			// 4 colours = tetradic
@@ -291,7 +310,12 @@ void PaletteTable::resolvePalette(std::vector<std::vector<Component *>> palette)
 					g = rgb.g;
 					b = rgb.b;
 
-					palette[p][i]->_clr = wxColour(r, g, b);
+					if (palette[p][i]->_staticColour != wxNullColour) {
+						palette[p][i]->_clr = palette[p][i]->_staticColour;
+
+					} else if (palette[p][i]->_setByUser != true) {
+						palette[p][i]->_clr = wxColour(r, g, b);
+					}
 				}
 				break;
 			// 5+ colours = not being dealt with yet
@@ -301,26 +325,28 @@ void PaletteTable::resolvePalette(std::vector<std::vector<Component *>> palette)
 		}
 
 		for (int i = 0; i < palette[p].size(); i++) {
-			rgb.r = palette[p][i]->_clr.Red();
-			rgb.g = palette[p][i]->_clr.Green();
-			rgb.b = palette[p][i]->_clr.Blue();
-			hsv = srgb_to_okhsv(rgb);
+			if ((palette[p][i]->_staticColour == wxNullColour) && (palette[p][i]->_setByUser != true)) {
+				rgb.r = palette[p][i]->_clr.Red();
+				rgb.g = palette[p][i]->_clr.Green();
+				rgb.b = palette[p][i]->_clr.Blue();
+				hsv = srgb_to_okhsv(rgb);
 
-			if (palette[p][i]->_restrictBright == true) {
-				hsv.v = std::min(std::get<1>(palette[p][i]->_rangeBright), hsv.v);
-				hsv.v = std::max(std::get<0>(palette[p][i]->_rangeBright), hsv.v);
+				if (palette[p][i]->_restrictBright == true) {
+					hsv.v = std::min(std::get<1>(palette[p][i]->_rangeBright), hsv.v);
+					hsv.v = std::max(std::get<0>(palette[p][i]->_rangeBright), hsv.v);
+				}
+
+				if (palette[p][i]->_restrictSat == true) {
+					hsv.s = std::min(std::get<1>(palette[p][i]->_rangeSat), hsv.s);
+					hsv.s = std::max(std::get<0>(palette[p][i]->_rangeSat), hsv.s);
+				}
+
+				rgb = okhsv_to_srgb(hsv);
+				r = rgb.r;
+				g = rgb.g;
+				b = rgb.b;
+				palette[p][i]->_clr = wxColour(r, g, b);				
 			}
-
-			if (palette[p][i]->_restrictSat == true) {
-				hsv.s = std::min(std::get<1>(palette[p][i]->_rangeSat), hsv.s);
-				hsv.s = std::max(std::get<0>(palette[p][i]->_rangeSat), hsv.s);
-			}
-
-			rgb = okhsv_to_srgb(hsv);
-			r = rgb.r;
-			g = rgb.g;
-			b = rgb.b;
-			palette[p][i]->_clr = wxColour(r, g, b);
 		}
 	}
 }
@@ -372,7 +398,12 @@ void PaletteTable::resolveBackgrounds(std::vector<std::vector<Component *>> pale
 			g = rgb.g;
 			b = rgb.b;
 
-			palette[p][idxFore]->_clr = wxColour(r, g, b);
+			if (palette[p][idxFore]->_staticColour != wxNullColour) {
+				palette[p][idxFore]->_clr = palette[p][idxFore]->_staticColour;
+
+			} else if (palette[p][idxFore]->_setByUser != true) {
+				palette[p][idxFore]->_clr = wxColour(r, g, b);
+			}
 		}
 	}
 }
@@ -444,10 +475,19 @@ wxString PaletteTable::GetValue(int row, int col) {
 		case 0:
 			return _template->_components[row]._name;
 		case 1:
+			if (_template->_components[row]._clr == wxNullColour) {
+				return wxString::Format("00,00,00");
+			}
 			return wxString::Format("%02X,%02X,%02X", _template->_components[row]._clr.Red(), _template->_components[row]._clr.Green(), _template->_components[row]._clr.Blue());
 		case 2:
+			if (_template->_components[row]._clr == wxNullColour) {
+				return wxString::Format("000000");
+			}
 			return wxString::Format("%02X%02X%02X", _template->_components[row]._clr.Red(), _template->_components[row]._clr.Green(), _template->_components[row]._clr.Blue());
 		case 3:
+			if (_template->_components[row]._clr == wxNullColour) {
+				return wxString::Format("0,0,0");
+			}
 			return wxString::Format("%d,%d,%d", _template->_components[row]._clr.Red(), _template->_components[row]._clr.Green(), _template->_components[row]._clr.Blue());
 		default:
 			return "";

@@ -23,6 +23,11 @@ ImagePanel::ImagePanel(wxPanel *parent, wxByte *imageString, int size) : wxPanel
 }
 
 void ImagePanel::updatePalette(std::vector<wxColour> palette, std::vector<Component> components) {
+	for (int i = 0; i < palette.size(); i++) {
+		if (components[i]._clr == wxNullColour) {
+			components[i]._clr = wxColour(0,0,0);
+		}
+	}
 	for (int y = 0; y < _imageH; y++) {
 		for (int x = 0; x < _imageW; x++) {
 			// We start by setting the potential new colour to 0, and getting the initial distances and similarity values

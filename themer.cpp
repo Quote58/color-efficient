@@ -196,17 +196,17 @@ void ThemerFrame::populateTemplates() {
 	Template *templateWebsite = new Template();
 	templateWebsite->_imageBytes = _imageBytesWebsite;
 	templateWebsite->_imageSize = 25680;
-	templateWebsite->_imagePalette = {wxColour(252,241,113), wxColour(226,121,46), wxColour(164,247,106), wxColour(241,155,145), wxColour(237,110,87), wxColour(218,59,38), wxColour(28,70,114), wxColour(241,154,200), wxColour(137,32,82)};
+	templateWebsite->_imagePalette = {wxColour(252,241,113), wxColour(226,121,46), wxColour(164,247,106), wxColour(241,155,145), wxColour(237,110,87), wxColour(218,59,38), wxColour(115, 191, 249), wxColour(30,76,124), wxColour(241,154,200), wxColour(137,32,82)};
 	templateWebsite->_components = {
-	Component("Header Background", 1, kBackground),
+	Component("Header Background", 1, true, std::make_tuple(0, 80), true, std::make_tuple(0,50), kBackground),
 	Component("Header Forground", 1, kForeground),
-	Component("Background", 2, kBackground),
+	Component("Background", 2, kBackground, *wxWHITE),
 	Component("Text [H1]", 2, kForeground),
 	Component("Text [H2]", -1, 3, kRelCNone, kRelBDarker, kRelSNone, kBackNone),
 	Component("Text [H3]", -1, 4, kRelCNone, kRelBDarker, kRelSNone, kBackNone),
 	Component("Accent Background", 3, kBackground),
 	Component("Accent Foreground", 3, kForeground),
-	Component("Footer Background", 4, kBackground),
+	Component("Footer Background", 4, true, std::make_tuple(0, 30), true, std::make_tuple(0,30), kBackground),
 	Component("Footer Foreground", 4, kForeground)
 	};
 	_initTemplates.push_back(templateWebsite);
@@ -320,7 +320,7 @@ void ThemerFrame::onReset(wxCommandEvent &event) {
 	// This literally just blanks out the colour in each component of the current palette table
 	PaletteTable *table = (PaletteTable *) _paletteGrids[_template]->GetTable();
 	for (int i = 0; i < table->_template->_components.size(); i++) {
-		table->_template->_components[i]._clr = wxColour(0,0,0,0);
+		table->_template->_components[i]._clr = wxNullColour;
 		table->_template->_components[i]._setByUser = false;
 	}
 
